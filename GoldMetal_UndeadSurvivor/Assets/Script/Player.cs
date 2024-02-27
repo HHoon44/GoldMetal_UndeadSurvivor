@@ -9,11 +9,15 @@ public class Player : MonoBehaviour
     public Vector2 inputVec;
     public float speed;
     private Rigidbody2D rigid;
+    private SpriteRenderer sprite;
+    private Animator anim;
 
 
     private void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
+        sprite = GetComponent<SpriteRenderer>();
+        anim = GetComponent<Animator>();
     }
 
     private void Start()
@@ -37,6 +41,17 @@ public class Player : MonoBehaviour
         // 위치 이동
         // 위치 이동이라 현재 위치를 더해줘야 한다
         rigid.MovePosition(rigid.position + nextVec);
+    }
+
+    private void LateUpdate()
+    {
+        anim.SetFloat("Speed", inputVec.magnitude);
+
+        // 좌우 반전
+        if (inputVec.x != 0)
+        {
+            sprite.flipX = inputVec.x < 0 ? true : false;
+        }
     }
 
     private void OnMove(InputValue value)
