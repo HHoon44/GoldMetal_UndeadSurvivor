@@ -4688,7 +4688,7 @@ MonoBehaviour:
   id: 0
   prefabId: 1
   damage: 5
-  count: 1
+  count: 3
   speed: 0
 --- !u!1 &440339573
 GameObject:
@@ -9669,6 +9669,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inputVec: {x: 0, y: 0}
   speed: 3
+  scanner: {fileID: 0}
 --- !u!114 &1234860187
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9793,7 +9794,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   nearestTarget: {fileID: 0}
-  diff: 100
 --- !u!1 &1404738338
 GameObject:
   m_ObjectHideFlags: 0

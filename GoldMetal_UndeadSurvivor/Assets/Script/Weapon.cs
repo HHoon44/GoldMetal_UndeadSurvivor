@@ -99,7 +99,7 @@ public class Weapon : MonoBehaviour
 
             bullet.Rotate(rotVec);
             bullet.Translate(bullet.up * 1.5f, Space.World);
-            bullet.GetComponent<Bullet>().Initialize(damage, -1);
+            bullet.GetComponent<Bullet>().Initialize(damage, -1, Vector3.zero);
 
             // -1 is Infinity Per.
         }
@@ -110,13 +110,23 @@ public class Weapon : MonoBehaviour
     /// </summary>
     private void Fire()
     {
+        /// Quaternion.FromToRotation : 지정된 축을 중심으로 목표를 향해 회전하는 함수
+
         // 가까운 적이 있는지 확인하는 작업
         if (!player.scanner.nearestTarget)
         {
             return;
         }
 
+        // 적의 위치
+        Vector3 targetPos = player.scanner.nearestTarget.position;
+
+        // 적의 방향
+        Vector3 dir = targetPos - transform.position.normalized;
+
         Transform bullet = GameManager.instance.pool.Get(prefabId).transform;
         bullet.position = transform.position;
+        bullet.rotation = Quaternion.FromToRotation(Vector3.up, dir);
+        bullet.GetComponent<Bullet>().Initialize(damage, count, dir);
     }
 }

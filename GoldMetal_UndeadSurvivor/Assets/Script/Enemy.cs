@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using Unity.VisualScripting.FullSerializer;
 using UnityEditor.AnimatedValues;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Enemy : MonoBehaviour
 {
@@ -15,19 +17,23 @@ public class Enemy : MonoBehaviour
     private bool isLive = true;
 
     private Rigidbody2D rigid;
+    private Collider2D coll;
     private Animator anim;
     private SpriteRenderer spriter;
+    private WaitForFixedUpdate wait;
 
     private void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
+        coll = GetComponent<Collider2D>();
         anim = GetComponent<Animator>();
         spriter = GetComponent<SpriteRenderer>();
+        wait = new WaitForFixedUpdate();
     }
 
     private void FixedUpdate()
     {
-        if (!isLive)
+        if (!isLive || anim.GetCurrentAnimatorStateInfo(0).IsName("Hit"))
         {
             return;
         }
@@ -52,6 +58,10 @@ public class Enemy : MonoBehaviour
     {
         target = GameManager.instance.player.GetComponent<Rigidbody2D>();
         isLive = true;
+        coll.enabled = true;
+        rigid.simulated = true;
+        spriter.sortingOrder = 2;
+        anim.SetBool("Dead", false);
         health = maxHealth;
     }
 
@@ -76,15 +86,30 @@ public class Enemy : MonoBehaviour
 
         // 체력 감소
         health -= collision.GetComponent<Bullet>().damage;
+        StartCoroutine(KnockBack());
 
         if (health > 0)
         {
-
+            anim.SetTrigger("Hit");
         }
         else
         {
-            Dead();
+            isLive = false;
+            coll.enabled = false;
+            rigid.simulated = false;
+            spriter.sortingOrder = 1;
+            anim.SetBool("Dead", true);
         }
+    }
+
+    IEnumerator KnockBack()
+    {
+        // 다음 하나의 물리 프레임 딜레이
+        yield return wait;
+
+        Vector3 playerPos = GameManager.instance.player.transform.position;
+        Vector3 dirVec = transform.position - playerPos;
+        rigid.AddForce(dirVec.normalized * 3f, ForceMode2D.Impulse);
     }
 
     /// <summary>
@@ -94,6 +119,4 @@ public class Enemy : MonoBehaviour
     {
         gameObject.SetActive(false);
     }
-
-
 }
